@@ -1,0 +1,38 @@
+>Feature ref|NC_001846.1|
+210	21745	gene
+			gene	1
+			locus_tag	MHVgp1
+			note	translational frameshift on a slippery sequence results in expression of orf1a and orf1b as a single polyprotein 1ab
+			db_xref	GeneID:1489749
+210	13622	CDS
+			product	RNA-directed RNA polymerase
+			prot_desc	ORF1A
+			protein_id	ref|NP_045298.1|
+13544	21745	CDS
+			product	RNA-directed RNA polymerase
+			prot_desc	ORF1B
+			protein_id	ref|NP_045299.1|
+23929	27903	gene
+			gene	S
+			locus_tag	MHVgp4
+			db_xref	GeneID:1489752
+23929	27903	CDS
+			product	E2 glycoprotein precursor
+			prot_desc	spike glycoprotein
+			protein_id	ref|NP_045300.1|
+28968	29654	gene
+			gene	M
+			locus_tag	MHVgp8
+			db_xref	GeneID:1489756
+28968	29654	CDS
+			product	E1 glycoprotein
+			product	matrix glycoprotein
+			protein_id	ref|NP_045301.1|
+29669	31033	gene
+			gene	N
+			locus_tag	MHVgp9
+			db_xref	GeneID:1489757
+29669	31033	CDS
+			product	nucleocapsid protein
+			protein_id	ref|NP_045302.1|
+
