@@ -92,6 +92,10 @@ class CsvWriter:
         ]
 
 
+    def write_headers(self, writer):
+        writer.writerow(self.CSV_HEADERS)
+
+
     def print_features_csv(self, writer, feat, summarized_features):
         row = [
             feat.type,
@@ -113,7 +117,6 @@ class CsvWriter:
             get_palindrome_coverage(feat.type, feat.palindromes, 12, True)
         ]
 
-        writer.writerow(self.CSV_HEADERS)
         writer.writerow(row)
 
         # summary stats
@@ -141,6 +144,7 @@ class CsvWriter:
                 "Average coverage IR 12+ - merged overlapping IRs":  row[14],
                 "Average coverage IR 12+ - non-overlapping IRs":  row[15]
             }
+
 
     def print_summary_csv(self, writer, summarized_features):
 

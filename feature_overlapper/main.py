@@ -109,6 +109,7 @@ def compare_results(features, palindromes, ncbi_id):
     print("\n *** Beginning file export *** ")
 
     txt_writer.print_general_stats(ncbi_id, totals)
+    csv_writer.write_headers(feature_writer)
     for f in features:
         txt_writer.print_feature_stats(f)
         csv_writer.print_features_csv(feature_writer, f, summarized_features)
