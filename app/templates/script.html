@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<form class="mt-4" action="{{ url_for('feature_overlapper') }}" method="POST" enctype="multipart/form-data">
+  <div class="form-group">
+    <div class="custom-file">
+      <input type="file" class="custom-file-input" id="palindromeFiles" name="palindromeFiles" multiple>
+      <label class="custom-file-label" id="palindromeFilesLabel" for="palindromeFiles">Choose file(s) with palindrome(s)</label>
+      <small id="palindromeHelp" class="form-text text-muted">Select one or multiple files with palindrome analysis.</small>
+      {% if pal_err_msg %}
+        <small style="color:red;" class="form-text error-log">{{ pal_err_msg }}</small>
+      {% endif %}
+
+    </div>
+
+
+    <div class="custom-file">
+      <input type="file" class="custom-file-input" id="featureFiles" name="featureFiles" multiple>
+      <label class="custom-file-label" id="featureFilesLabel" for="featureFiles">Choose file(s) with feature(s)</label>
+      <small id="featureHelp" class="form-text text-muted">Select one or multiple files with NCBI features.</small>
+      {% if feat_err_msg %}
+        <small style="color:red;" class="form-text error-log">{{ feat_err_msg }}</small>
+      {% endif %}
+
+    </div>
+  </div>
+
+  <button type="submit" class="btn btn-primary">Merge</button>
+</form>
+
+{% endblock %}
