@@ -1,5 +1,21 @@
 {% extends "base.html" %}
 {% block content %}
+
+<h2>Feature overlapper</h2>
+
+<div class="card card-body bg-light">
+  Load feature (annotation) files together with palindrome analysis files and the server will return ZIP file containing merged results.
+  <br>
+  Detailed merge results are in the file <code>NC_1234_palindrome_to_feature.txt</code>
+  <br>
+  Detailed statistics are in the file <code>NC_1234_feature_palindromes.csv</code>
+  <br>
+  Merged statistics are in the file <code>NC_1234_merged.csv</code>
+  <br>
+  Overall statistics (from all CSV files) are in the file <code>overall_summary.csv</code>
+  <br>
+</div>
+
 <form class="mt-4" action="{{ url_for('feature_overlapper') }}" method="POST" enctype="multipart/form-data">
   <div class="form-group">
     <div class="custom-file">

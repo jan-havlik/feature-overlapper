@@ -1,64 +1,73 @@
 import copy
 
+from io import StringIO
+
 class AnnotationLoader:
 
     def __init__(self):
         self.ncbi = "" # ncbi id
         self.annotations = []
         
-    def load(self, path):
-        with open(path, 'r') as af:
-            try:
-                # get ncbi id from the first line
-                self.ncbi = af.readline().split('|')[1]
-            except IndexError:
-                print("No NCBI ID defined in the first line of the file.")
+    def load(self, path, file=None):
+        
+        if file:
+            af = file
+        else:
+            af = open(path, 'r')
 
-            info_line = ""
-            # file processing
-            for line in af:
+        try:
+            # get ncbi id from the first line
+            self.ncbi = af.readline().split('|')[1]
+        except IndexError:
+            print("No NCBI ID defined in the first line of the file.")
 
-                splitted = line.split('\t')
+        info_line = ""
+        # file processing
+        for line in af:
 
-                if splitted[0] is '':
-                    
-                    if len(splitted) >= 5:
-                        info_line += f"{splitted[3]} ({splitted[4].strip()}), "
-                    else:
-                        info_line += f"{splitted[3].strip()}, "
-                    
-                    continue
+            splitted = line.split('\t')
+
+            if splitted[0] is '':
                 
-                try: # feature position
-                    start,end = int(splitted[0]), int(splitted[1])
-                    type = splitted[2].strip() if len(splitted) > 2 else type
-                    """
-                    There might be a situation, where we have same feature defined on multiple places in sequence.
-                    e.g.:
+                if len(splitted) >= 5:
+                    info_line += f"{splitted[3]} ({splitted[4].strip()}), "
+                else:
+                    info_line += f"{splitted[3].strip()}, "
+                
+                continue
+            
+            try: # feature position
+                start,end = int(splitted[0]), int(splitted[1])
+                type = splitted[2].strip() if len(splitted) > 2 else type
+                """
+                There might be a situation, where we have same feature defined on multiple places in sequence.
+                e.g.:
 
-                    529	12354	CDS
-                    12354	20417
-                                    product	ORF1ab polyprotein
-                                    product	frameshift product
-                                    protein_id	ref|NP_066134.1|
-                                    evidence	experimental 
-                    
-                    that's why we cannot use tabs to determine loci identification
-                    """
-                    annotation = Annotation(
-                        start=start,
-                        end=end,
-                        type=type,
-                        info=str(info_line),
-                        ncbi_id=self.ncbi
-                    )
-                    self.annotations.append(annotation)
-                    info_line = ""
-                except ValueError:
-                    # some garbage
-                    pass
-                except IndexError:
-                    break # EOF
+                529	12354	CDS
+                12354	20417
+                                product	ORF1ab polyprotein
+                                product	frameshift product
+                                protein_id	ref|NP_066134.1|
+                                evidence	experimental 
+                
+                that's why we cannot use tabs to determine loci identification
+                """
+                annotation = Annotation(
+                    start=start,
+                    end=end,
+                    type=type,
+                    info=str(info_line),
+                    ncbi_id=self.ncbi
+                )
+                self.annotations.append(annotation)
+                info_line = ""
+            except ValueError:
+                # some garbage
+                pass
+            except IndexError:
+                af.close()
+                break # EOF
+        af.close()
 
     def return_annotations(self):
         return self.annotations

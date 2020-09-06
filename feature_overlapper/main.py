@@ -1,16 +1,21 @@
+from os.path import basename
+
 import csv
 import copy
 import xml.etree.ElementTree as ET
 from pathlib import Path
+import zipfile
 
-from annotation_loader import AnnotationLoader
-from palindrome_loader import PalindromeLoader, Palindrome
-from aggregator import Aggregator
-from output import TxtWriter, CsvWriter
-from util import (_COMPARISON_DIR,
-                 _PALINDROME_RES_DIR,
-                 _FEATURES_RES_DIR,
-                 _SEQ_SUMMARY_DIR)
+from feature_overlapper.annotation_loader import AnnotationLoader
+from feature_overlapper.palindrome_loader import PalindromeLoader, Palindrome
+from feature_overlapper.aggregator import Aggregator
+from feature_overlapper.output import TxtWriter, CsvWriter
+from feature_overlapper.util import (
+    _COMPARISON_DIR,
+    _PALINDROMES_DIR,
+    _FEATURES_DIR,
+    _SUMMARY_DIR
+)
 
 
 def rearrange_overlapping_palindromes(pals):
@@ -56,8 +61,25 @@ def rearrange_overlapping_palindromes(pals):
 
     return non_overlapping
 
+def zip_results(unlink=False):
+
+    zip_file = zipfile.ZipFile('/tmp/results.zip', 'w')
+
+    for f in Path(_COMPARISON_DIR).iterdir():
+        zip_file.write(f, basename(f))
+        
+        if unlink:
+        # removes files after processing, useful for server calls
+            f.unlink()
+    
+    zip_file.close()
+    return zip_file
+
 
 def compare_results(features, palindromes, ncbi_id):
+
+    Path(_COMPARISON_DIR).mkdir(parents=True, exist_ok=True) # /comparison
+    Path(_SUMMARY_DIR).mkdir(parents=True, exist_ok=True) # /seq_summary
 
     # file handlers
     result_file = open(_COMPARISON_DIR / f'{ncbi_id}_palindrome_to_feature.txt', 'w')
@@ -135,12 +157,12 @@ def main():
     _NCBI_ID = None
 
     # init environment, create default folders if they do not exist
-    Path(_FEATURES_RES_DIR).mkdir(parents=True, exist_ok=True) # /features
-    Path(_PALINDROME_RES_DIR).mkdir(parents=True, exist_ok=True) # /palindromes
+    Path(_FEATURES_DIR).mkdir(parents=True, exist_ok=True) # /features
+    Path(_PALINDROMES_DIR).mkdir(parents=True, exist_ok=True) # /palindromes
     Path(_COMPARISON_DIR).mkdir(parents=True, exist_ok=True) # /comparison
-    Path(_SEQ_SUMMARY_DIR).mkdir(parents=True, exist_ok=True) # /seq_summary
+    Path(_SUMMARY_DIR).mkdir(parents=True, exist_ok=True) # /seq_summary
 
-    pathlist_annotations = Path(_FEATURES_RES_DIR).glob('**/*_ft.txt')
+    pathlist_annotations = Path(_FEATURES_DIR).glob('**/*_ft.txt')
     for path_obj in pathlist_annotations:
         path = str(path_obj.as_posix()) # ensure slash format
 
@@ -154,10 +176,10 @@ def main():
             exit(1)
 
         af = AnnotationLoader()
-        af.load(_FEATURES_RES_DIR / f"{_NCBI_ID}_ft.txt")
+        af.load(_FEATURES_DIR / f"{_NCBI_ID}_ft.txt")
 
         pf = PalindromeLoader()
-        pf.load(_PALINDROME_RES_DIR / f"{_NCBI_ID}_palindromes.csv")
+        pf.load(_PALINDROMES_DIR / f"{_NCBI_ID}_palindromes.csv")
 
         compare_results(af.return_annotations(), pf.return_palindromes(), _NCBI_ID)
 

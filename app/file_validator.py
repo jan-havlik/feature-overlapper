@@ -16,3 +16,5 @@ def validate_files(filename, ftype):
     
     return False
 
+def get_ncbi(filename):
+    return filename.split("_")[1]

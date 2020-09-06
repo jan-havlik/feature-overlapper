@@ -1,4 +1,4 @@
-from util import get_seq_len, get_palindrome_count, get_palindrome_coverage
+from feature_overlapper.util import get_seq_len, get_palindrome_count, get_palindrome_coverage
 
 
 class TxtWriter:

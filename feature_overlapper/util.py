@@ -3,10 +3,9 @@ from urllib.request import Request, urlopen
 from pathlib import Path
 
 _COMPARISON_DIR = Path("./comparison/")
-_PALINDROME_RES_DIR = Path("./palindromes/")
-_FEATURES_RES_DIR = Path("./features/")
-_SEQ_SUMMARY_DIR = Path("./seq_summary/")
-
+_PALINDROMES_DIR = Path("./palindromes/")
+_FEATURES_DIR = Path("./features/")
+_SUMMARY_DIR = Path("./seq_summary/")
 
 def get_seq_len(ncbi_id):
     url = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id={ncbi_id}&rettype=fasta&retmode=xml"
@@ -17,10 +16,10 @@ def get_seq_len(ncbi_id):
         print(f"Request to NCBI server failed due to {res.status}:{res.reason}")
         exit(1)
     
-    with open(_SEQ_SUMMARY_DIR / f'{ncbi_id}.xml', 'w') as f: 
+    with open(_SUMMARY_DIR / f'{ncbi_id}.xml', 'w') as f: 
         f.write(res.read().decode('ascii'))
 
-    root = ET.parse(_SEQ_SUMMARY_DIR / f'{ncbi_id}.xml').getroot()
+    root = ET.parse(_SUMMARY_DIR / f'{ncbi_id}.xml').getroot()
     return int(root.find("./TSeq/TSeq_length").text) * 1.0
 
 

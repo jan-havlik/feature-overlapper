@@ -6,21 +6,28 @@ class PalindromeLoader:
     def __init__(self):
         self.palindromes = []
 
-    def load(self, path):
-        with open(path, newline='') as csv_f:
-            reader = csv.reader(csv_f, delimiter=',', quotechar='|')
-            next(reader) # skip header
-            for row in reader:
+    def load(self, path, file=None):
 
-                start = int(row[1].strip('"'))
-                # calculate end position of inverse repetition
-                # length * 2 + spacer
-                end = start + (int(row[2].strip('"')) * 2 + int(row[3].strip('"')))
+        if file:
+            csv_f = file
+        else:
+            csv_f = open(path, newline='')
 
-                # length of the palindrome taken as the first number. e.g. 6-0-1 -> len is 6
-                length = int(row[0].strip('"').split('-')[0])
+        reader = csv.reader(csv_f, delimiter=',', quotechar='|')
+        next(reader) # skip header
+        for row in reader:
 
-                self.palindromes.append(Palindrome(start, end, length))
+            start = int(row[1].strip('"'))
+            # calculate end position of inverse repetition
+            # length * 2 + spacer
+            end = start + (int(row[2].strip('"')) * 2 + int(row[3].strip('"')))
+
+            # length of the palindrome taken as the first number. e.g. 6-0-1 -> len is 6
+            length = int(row[0].strip('"').split('-')[0])
+
+            self.palindromes.append(Palindrome(start, end, length))
+
+        csv_f.close()
 
     def return_palindromes(self):
         return self.palindromes
