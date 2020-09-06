@@ -3,12 +3,14 @@ import logging
 import os
 import time
 from io import StringIO
+from zipfile import ZipFile
 
 from flask import Flask, render_template, request, flash, redirect, url_for, send_from_directory, abort, Response
 from werkzeug.utils import secure_filename
   
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = '/tmp'
+app.config['EXAMPLES_FOLDER'] = './examples'
   
 from app.file_validator import validate_files, get_ncbi
 from feature_overlapper.annotation_loader import AnnotationLoader
@@ -20,6 +22,11 @@ from feature_overlapper.util import _COMPARISON_DIR
 @app.route("/") 
 def welcome_page(): 
     return render_template('index.html', year=datetime.datetime.now().year)
+
+@app.route("/example/feature-overlapper")
+def feature_overlapper_example_files():
+
+    return send_from_directory(app.config["EXAMPLES_FOLDER"], filename="feature_overlapper.zip", as_attachment=True)
 
 @app.route("/scripts/feature-overlapper", methods=['GET', 'POST'])
 def feature_overlapper():
