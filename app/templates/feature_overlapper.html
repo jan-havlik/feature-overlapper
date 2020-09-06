@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Feature overlapper</h2>
+
+<div class="card card-body bg-light">
+  Load feature (annotation) files together with palindrome analysis files and the server will return ZIP file containing merged results.
+  <br>
+  Detailed merge results are in the file <code>NC_1234_palindrome_to_feature.txt</code>
+  <br>
+  Detailed statistics are in the file <code>NC_1234_feature_palindromes.csv</code>
+  <br>
+  Merged statistics are in the file <code>NC_1234_merged.csv</code>
+  <br>
+  Overall statistics (from all CSV files) are in the file <code>overall_summary.csv</code>
+  <br>
+
+  <hr>
+  <a href="{{ url_for('feature_overlapper_example_files') }}">You can download some example files here.</a>
+</div>
+
+<form class="mt-4" action="{{ url_for('feature_overlapper') }}" method="POST" enctype="multipart/form-data">
+  <div class="form-group">
+    <div class="custom-file">
+      <input type="file" class="custom-file-input" id="palindromeFiles" name="palindromeFiles" multiple>
+      <label class="custom-file-label" id="palindromeFilesLabel" for="palindromeFiles">Choose file(s) with palindrome(s)</label>
+      <small id="palindromeHelp" class="form-text text-muted">Select one or multiple files with palindrome analysis.</small>
+      {% if pal_err_msg %}
+        <small style="color:red;" class="form-text error-log">{{ pal_err_msg }}</small>
+      {% endif %}
+
+    </div>
+
+
+    <div class="custom-file">
+      <input type="file" class="custom-file-input" id="featureFiles" name="featureFiles" multiple>
+      <label class="custom-file-label" id="featureFilesLabel" for="featureFiles">Choose file(s) with feature(s)</label>
+      <small id="featureHelp" class="form-text text-muted">Select one or multiple files with NCBI features.</small>
+      {% if feat_err_msg %}
+        <small style="color:red;" class="form-text error-log">{{ feat_err_msg }}</small>
+      {% endif %}
+
+    </div>
+  </div>
+
+  <button type="submit" class="btn btn-primary">Merge</button>
+</form>
+
+{% endblock %}

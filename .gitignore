@@ -10,9 +10,18 @@
 !Makefile
 !requirements.txt
 !README.md
+!Procfile
+!runtime.txt
+!wsgi.py
 
 !mypy.ini
 !pylintrc
+
+!app/
+!app/**
+!app/**/*.py
+
+app/__pycache__/
 
 !feature_overlapper/
 !feature_overlapper/**/
