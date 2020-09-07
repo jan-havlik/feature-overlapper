@@ -4,6 +4,8 @@ import os
 import time
 from io import StringIO
 from zipfile import ZipFile
+from waiting import wait, TimeoutExpired
+import requests
 
 from flask import Flask, render_template, request, flash, redirect, url_for, send_from_directory, abort, Response
 from werkzeug.utils import secure_filename
@@ -18,6 +20,8 @@ from feature_overlapper.palindrome_loader import PalindromeLoader
 from feature_overlapper.aggregator import Aggregator
 from feature_overlapper.main import compare_results, zip_results
 from feature_overlapper.util import _COMPARISON_DIR
+
+from rloop_stats.main import login_to_analyser, import_sequence, wait_for_sequence, start_rloop_analysis
 
 @app.route("/") 
 def welcome_page(): 
@@ -96,3 +100,57 @@ def feature_overlapper():
         return send_from_directory(app.config["UPLOAD_FOLDER"], filename="results.zip", as_attachment=True)
 
     return render_template('feature_overlapper.html')
+
+
+@app.route("/scripts/rloop-stats", methods=['GET', 'POST'])
+def rloop_stats():
+
+    if request.method == 'POST':
+
+        login = request.form["rloopStatsEmail"]
+        pwd = request.form["rloopStatsPassword"]
+        ref_seq = request.form["rloopStatsRefSeq"]
+
+        login_response = login_to_analyser(login, pwd)
+        app.logger.info(login_response)
+        
+        if login_response.status_code != 201:
+            return render_template('rloop_stats.html', err_msg="DNA Analyser authentization failed.")
+
+        jwt_token = login_response.text
+
+        # store sequence on DNA analyser web
+        seq_id = import_sequence(f"Bioscripts_{ref_seq}", ref_seq, jwt_token)
+
+        if not seq_id:
+            return render_template('rloop_stats.html', err_msg="Sequence was not imported (bad RefSeq?).")
+
+        app.logger.info(seq_id)
+
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': jwt_token
+        }
+
+        seq_created_predicate = lambda : wait_for_sequence(seq_id, headers)
+        try:
+            wait(seq_created_predicate, sleep_seconds=(1, 100))
+        except RuntimeError:
+            return render_template('rloop_stats.html', err_msg=f"Sequence with RefSeq {ref_seq} import FAILED.")
+        except TimeoutExpired:
+            return render_template('rloop_stats.html', err_msg="Timeout while waiting for sequence import (100 s)")
+        except AttributeError:
+            pass # already exists
+
+        app.logger.info(f"Sequence {seq_id} imported succesfully.")
+
+        stats, img = start_rloop_analysis(seq_id, headers)
+      
+        return render_template('rloop_stats.html', stats=stats, filename=img)
+
+
+    return render_template('rloop_stats.html')
+
+@app.route("/files/graph/<filename>")
+def graph_download(filename):
+    return send_from_directory(app.config["UPLOAD_FOLDER"], filename=filename, as_attachment=True)
