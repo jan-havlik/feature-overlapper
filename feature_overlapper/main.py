@@ -118,7 +118,7 @@ def compare_results(features, palindromes, ncbi_id):
             totals["palindromes_merged"] = {*totals["palindromes_merged"], *p_mo.range}    
             f.add_palindrome(p_mo)
 
-        print(f"Processed feature {f.type} ({f.start} - {f.end}) with {len(f.palindromes)} palindromes.")
+        print(f"Processed feature {f.type} ({f.start} - {f.end}) [complementary: {f.complementary}] with {len(f.palindromes)} palindromes.")
 
     # let the printing begin!
     # we loop through features again ... it's ugly, but it's for the sake of order of data in the file
