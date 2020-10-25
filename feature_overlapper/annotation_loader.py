@@ -25,7 +25,7 @@ class AnnotationLoader:
         # file processing
         for line in af:
 
-            splitted = line.split('\t').strip('<>')
+            splitted = [x.strip('<>') for x in line.split('\t')]
             complementary = False
 
             if splitted[0] == '':
