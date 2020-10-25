@@ -25,9 +25,10 @@ class AnnotationLoader:
         # file processing
         for line in af:
 
-            splitted = line.split('\t')
+            splitted = line.split('\t').strip('<>')
+            complementary = False
 
-            if splitted[0] is '':
+            if splitted[0] == '':
                 
                 if len(splitted) >= 5:
                     info_line += f"{splitted[3]} ({splitted[4].strip()}), "
@@ -38,6 +39,11 @@ class AnnotationLoader:
             
             try: # feature position
                 start,end = int(splitted[0]), int(splitted[1])
+                if start > end:
+                    # analyse complementary strand
+                    start, end = end, start
+                    complementary = True
+
                 type = splitted[2].strip() if len(splitted) > 2 else type
                 """
                 There might be a situation, where we have same feature defined on multiple places in sequence.
@@ -55,6 +61,7 @@ class AnnotationLoader:
                 annotation = Annotation(
                     start=start,
                     end=end,
+                    complementary=complementary,
                     type=type,
                     info=str(info_line),
                     ncbi_id=self.ncbi
@@ -74,9 +81,10 @@ class AnnotationLoader:
 
 
 class Annotation:
-    def __init__(self, start, end, type, info, ncbi_id):
+    def __init__(self, start, end, complementary, type, info, ncbi_id):
         self.start = start
         self.end = end
+        self.complementary = complementary
         self.type = type
         self.info = info
         self.range = set(range(self.start, self.end))
