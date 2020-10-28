@@ -102,8 +102,8 @@ def feature_overlapper():
         # store to zip
         q.enqueue(zip_results, True)
 
-        return render_template('feature_overlapper.html')
-        #return send_from_directory(app.config["UPLOAD_FOLDER"], filename="results.zip", as_attachment=True)
+        zip_data = q.enqueue(send_from_directory, app.config["UPLOAD_FOLDER"], filename="results.zip", as_attachment=True)
+        return zip_data
 
     return render_template('feature_overlapper.html')
 
