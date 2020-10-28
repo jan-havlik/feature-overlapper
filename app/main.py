@@ -97,12 +97,13 @@ def feature_overlapper():
 
         # aggregate CSVs
         aggregator = Aggregator()
-        aggregator.load_csv(_COMPARISON_DIR)
+        q.enqueue(aggregator.load_csv, _COMPARISON_DIR)
 
         # store to zip
-        zip_results(unlink=True)
+        q.enqueue(zip_results(unlink=True))
 
-        return send_from_directory(app.config["UPLOAD_FOLDER"], filename="results.zip", as_attachment=True)
+        return render_template('feature_overlapper.html')
+        #return send_from_directory(app.config["UPLOAD_FOLDER"], filename="results.zip", as_attachment=True)
 
     return render_template('feature_overlapper.html')
 
