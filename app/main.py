@@ -100,7 +100,7 @@ def feature_overlapper():
         q.enqueue(aggregator.load_csv, _COMPARISON_DIR)
 
         # store to zip
-        q.enqueue(zip_results(unlink=True))
+        q.enqueue(zip_results, True)
 
         return render_template('feature_overlapper.html')
         #return send_from_directory(app.config["UPLOAD_FOLDER"], filename="results.zip", as_attachment=True)
