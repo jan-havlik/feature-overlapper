@@ -9,11 +9,13 @@ import requests
 
 from flask import Flask, render_template, request, flash, redirect, url_for, send_from_directory, abort, Response
 from werkzeug.utils import secure_filename
+from rq import Queue
   
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = '/tmp'
 app.config['EXAMPLES_FOLDER'] = './examples'
-  
+
+from app.worker import conn
 from app.file_validator import validate_files, get_ncbi
 from feature_overlapper.annotation_loader import AnnotationLoader
 from feature_overlapper.palindrome_loader import PalindromeLoader
@@ -47,6 +49,9 @@ def feature_overlapper():
         pal_ncbis = dict()
 
         ploader = PalindromeLoader()
+
+        # redis queue
+        q = Queue(connection=conn)
 
 
         # load both files to tmp folder
@@ -88,7 +93,7 @@ def feature_overlapper():
             pf = PalindromeLoader()
             pf.load(app.config['UPLOAD_FOLDER'] + f"/{_NCBI_ID}_palindromes.csv")
 
-            compare_results(af.return_annotations(), pf.return_palindromes(), _NCBI_ID)
+            q.enqueue(compare_results, af.return_annotations(), pf.return_palindromes(), _NCBI_ID)
 
         # aggregate CSVs
         aggregator = Aggregator()
