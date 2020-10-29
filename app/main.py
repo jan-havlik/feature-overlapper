@@ -9,7 +9,9 @@ import requests
 
 from flask import Flask, render_template, request, flash, redirect, url_for, send_from_directory, abort, Response
 from werkzeug.utils import secure_filename
-from rq import Queue, Job
+from rq import Queue, get_current_job
+from rq.job import Job
+
   
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = '/tmp'
@@ -112,6 +114,15 @@ def feature_overlapper():
 def get_zip_data(job_key):
     job_key = job_key.replace("rq:job:", "")
     job = Job.fetch(job_key, connection=conn)
+
+    if(not job.is_finished):
+        return "Not yet ready", 202
+    else:
+        return job.result, 200
+
+@app.route("/current-job", methods=['GET'])
+def get_current_job():
+    job = get_current_job(connection=conn)
 
     if(not job.is_finished):
         return "Not yet ready", 202
