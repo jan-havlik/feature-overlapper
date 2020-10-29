@@ -9,7 +9,7 @@ import requests
 
 from flask import Flask, render_template, request, flash, redirect, url_for, send_from_directory, abort, Response
 from werkzeug.utils import secure_filename
-from rq import Queue
+from rq import Queue, Job
   
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = '/tmp'
@@ -102,10 +102,21 @@ def feature_overlapper():
         # store to zip
         q.enqueue(zip_results, True)
 
-        zip_data = q.enqueue(send_from_directory, app.config["UPLOAD_FOLDER"], filename="results.zip", as_attachment=True)
-        return zip_data
+        job = q.enqueue(send_from_directory, app.config["UPLOAD_FOLDER"], filename="results.zip", as_attachment=True)
+        return render_template('feature_overlapper.html', job_key=job.key)
 
     return render_template('feature_overlapper.html')
+
+
+@app.route("/zip-result/<job_key>", methods=['GET'])
+def get_zip_data(job_key):
+    job_key = job_key.replace("rq:job:", "")
+    job = Job.fetch(job_key, connection=conn)
+
+    if(not job.is_finished):
+        return "Not yet ready", 202
+    else:
+        return job.result, 200
 
 
 @app.route("/scripts/rloop-stats", methods=['GET', 'POST'])
