@@ -96,7 +96,8 @@ def feature_overlapper():
             pf = PalindromeLoader()
             pf.load(app.config['UPLOAD_FOLDER'] + f"/{_NCBI_ID}_palindromes.csv")
 
-            q.enqueue(compare_results, af.return_annotations(), pf.return_palindromes(), _NCBI_ID)
+            # 10 min timeout
+            q.enqueue(compare_results, af.return_annotations(), pf.return_palindromes(), _NCBI_ID, job_timeout=600)
         
         return render_template('feature_overlapper.html')
 
@@ -113,7 +114,7 @@ def get_current_job():
         print('Job %s: %s - %s' % (job.id, job.func_name, job.is_finished))
 
 
-    if(not job.is_finished):
+    if(len(jobs) > 0):
         return "Not yet ready", 202
     else:
         aggregate_and_zip()
