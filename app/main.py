@@ -22,7 +22,7 @@ from app.file_validator import validate_files, get_ncbi
 from feature_overlapper.annotation_loader import AnnotationLoader
 from feature_overlapper.palindrome_loader import PalindromeLoader
 from feature_overlapper.aggregator import Aggregator
-from feature_overlapper.main import compare_results, zip_results
+from feature_overlapper.main import compare_results, zip_results, aggregate_and_zip
 from feature_overlapper.util import _COMPARISON_DIR
 
 from rloop_stats.main import login_to_analyser, import_sequence, wait_for_sequence, start_rloop_analysis
@@ -96,38 +96,24 @@ def feature_overlapper():
             pf.load(app.config['UPLOAD_FOLDER'] + f"/{_NCBI_ID}_palindromes.csv")
 
             q.enqueue(compare_results, af.return_annotations(), pf.return_palindromes(), _NCBI_ID)
-
-        # aggregate CSVs
-        aggregator = Aggregator()
-        q.enqueue(aggregator.load_csv, _COMPARISON_DIR)
-
-        # store to zip
-        q.enqueue(zip_results, True)
-
-        job = q.enqueue(send_from_directory, app.config["UPLOAD_FOLDER"], filename="results.zip", as_attachment=True)
-        return render_template('feature_overlapper.html', job_key=job.key)
+        
+        return render_template('feature_overlapper.html')
 
     return render_template('feature_overlapper.html')
 
 
-@app.route("/zip-result/<job_key>", methods=['GET'])
-def get_zip_data(job_key):
-    job_key = job_key.replace("rq:job:", "")
-    job = Job.fetch(job_key, connection=conn)
-
-    if(not job.is_finished):
-        return "Not yet ready", 202
-    else:
-        return job.result, 200
-
-@app.route("/current-job", methods=['GET'])
+@app.route("/jobs-done", methods=['GET'])
 def get_current_job():
-    job = get_current_job(connection=conn)
+    jobs = Job.fetch_many(connection=conn)
+    for job in jobs:
+        print('Job %s: %s - %s' % (job.id, job.func_name, job.is_finished))
+
 
     if(not job.is_finished):
         return "Not yet ready", 202
     else:
-        return job.result, 200
+        aggregate_and_zip()
+        return send_from_directory(app.config["UPLOAD_FOLDER"], filename="results.zip", as_attachment=True)
 
 
 @app.route("/scripts/rloop-stats", methods=['GET', 'POST'])

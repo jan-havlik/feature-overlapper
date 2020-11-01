@@ -148,6 +148,15 @@ def compare_results(features, palindromes, ncbi_id):
     merged_csv.close()
 
 
+def aggregate_and_zip():
+
+    # aggregate CSVs
+    aggregator = Aggregator()
+    aggregator.load_csv(_COMPARISON_DIR)
+
+    # store to zip
+    zip_results(True)
+
 def main():
 
     """
