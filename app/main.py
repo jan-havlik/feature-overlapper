@@ -11,6 +11,7 @@ from flask import Flask, render_template, request, flash, redirect, url_for, sen
 from werkzeug.utils import secure_filename
 from rq import Queue, get_current_job
 from rq.job import Job
+from rq.registry import StartedJobRegistry
 
   
 app = Flask(__name__)
@@ -104,7 +105,10 @@ def feature_overlapper():
 
 @app.route("/jobs-done", methods=['GET'])
 def get_current_job():
-    jobs = Job.fetch_many(connection=conn)
+    registry = StartedJobRegistry('default', connection=conn)
+    running_job_ids = registry.get_job_ids()
+    jobs = Job.fetch_many(running_job_ids, connection=conn)
+
     for job in jobs:
         print('Job %s: %s - %s' % (job.id, job.func_name, job.is_finished))
 
