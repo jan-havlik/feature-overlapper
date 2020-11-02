@@ -23,7 +23,7 @@ from app.file_validator import validate_files, get_ncbi
 from feature_overlapper.annotation_loader import AnnotationLoader
 from feature_overlapper.palindrome_loader import PalindromeLoader
 from feature_overlapper.aggregator import Aggregator
-from feature_overlapper.main import compare_results, zip_results, aggregate_and_zip
+from feature_overlapper.main import compare_results, zip_results
 from feature_overlapper.util import _COMPARISON_DIR
 
 from rloop_stats.main import login_to_analyser, import_sequence, wait_for_sequence, start_rloop_analysis
@@ -117,7 +117,12 @@ def get_current_job():
     if(len(jobs) > 0):
         return "Not yet ready", 202
     else:
-        aggregate_and_zip()
+        # aggregate CSVs
+        aggregator = Aggregator()
+        aggregator.load_csv(_COMPARISON_DIR)
+
+        # store to zip
+        zip_results(True)
         return send_from_directory(app.config["UPLOAD_FOLDER"], filename="results.zip", as_attachment=True)
 
 
