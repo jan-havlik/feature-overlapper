@@ -96,8 +96,8 @@ def feature_overlapper():
             pf = PalindromeLoader()
             pf.load(app.config['UPLOAD_FOLDER'] + f"/{_NCBI_ID}_palindromes.csv")
 
-            # 30 min timeout
-            q.enqueue(compare_results, af.return_annotations(), pf.return_palindromes(), _NCBI_ID, job_timeout=1800)
+            # 1 hour min timeout
+            q.enqueue(compare_results, af.return_annotations(), pf.return_palindromes(), _NCBI_ID, job_timeout=3600)
         
         return render_template('feature_overlapper.html')
 
