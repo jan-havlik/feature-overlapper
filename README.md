@@ -22,7 +22,7 @@ e.g. `NC_001451_ft.txt`.
 
 ## Palindrome analyzes
 
-Palindrome analyzes should be places in the `palindromes` directory. Each analysis has to have specific name:
+Palindrome analysis should be placed in the `palindromes` directory. Each analysis has to have specific name:
 ```
 <ncbi_id>_palindrome.csv
 ```
