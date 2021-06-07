@@ -1,0 +1,69 @@
+>Feature ref|NC_001451.1|
+529	20417	gene
+			gene	1ab
+			locus_tag	IBVgp1
+			note	translational frameshift on a slippery sequence results in expression of orf1a and orf1b as a single polyprotein 1ab
+			db_xref	GeneID:1489740
+529	12354	CDS
+12354	20417
+			product	ORF1ab polyprotein
+			product	frameshift product
+			protein_id	ref|NP_066134.1|
+			evidence	experimental
+529	12384	CDS
+			product	ORF1a polyprotein
+			protein_id	ref|NP_040829.1|
+			note	ORF for gene 1; label: 1a
+20368	23856	gene
+			gene	2
+			locus_tag	IBVgp2
+			db_xref	GeneID:1489741
+20368	23856	CDS
+			product	spike protein
+			protein_id	ref|NP_040831.1|
+			note	gene 2; label: S
+23856	24553	gene
+			gene	3
+			locus_tag	IBVgp3
+			db_xref	GeneID:1489742
+23856	24029	CDS
+			product	3a protein
+			protein_id	ref|NP_040832.1|
+			note	ORF for gene 3; label: 3a
+24029	24223	CDS
+			product	3b protein
+			protein_id	ref|NP_040833.1|
+			note	ORF for gene 3; label: 3b
+24207	24533	CDS
+			product	small virion-associated protein
+			protein_id	ref|NP_040834.1|
+			note	ORF for gene 3; label: sM
+24505	25182	gene
+			gene	M
+			locus_tag	IBVgp4
+			db_xref	GeneID:1489743
+24505	25182	CDS
+			product	membrane protein
+			protein_id	ref|NP_040835.1|
+			note	ORF for gene 4; label: M
+25488	25930	gene
+			gene	5
+			locus_tag	IBVgp5
+			db_xref	GeneID:1489744
+25488	25685	CDS
+			product	5a protein
+			protein_id	ref|NP_040836.1|
+			note	ORF for gene 5; label: 5a
+25682	25930	CDS
+			product	5b protein
+			protein_id	ref|NP_040837.1|
+			note	ORF for gene 5; label: 5b
+25873	27102	gene
+			gene	N
+			locus_tag	IBVgp6
+			db_xref	GeneID:1489745
+25873	27102	CDS
+			product	nucleocapsid protein
+			protein_id	ref|NP_040838.1|
+			note	ORF for gene 6; label: N
+
