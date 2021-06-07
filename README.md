@@ -1,35 +1,37 @@
-# Prerequisities
+# Feature overlapper
 
-- `python version >= 3.6`
-- `pathlib, xml and urllib.requests` should be part of standard library already
+Script used to overlap palindrome analyses with given feature files.
 
-# Usage
+## Environment
 
-Script starts processing data by running the `main.py` file as:
+This module uses `python3` with help of these following libraries:
+
+- `numpy`
+- `pandas`
+- `xlsxwriter`
+= `openpyxl`
+
+All dependant libs are listed in the `requirements.txt` file. To install them, use the following command:
+
 ```
-python3 main.py
+python3 -m pip install -r requirements.txt
 ```
 
-Script has no command line arguments, it relies on the following directory structure:
+## The script
 
-## Features
+The script merges palindrome analysis files in the `palindromes` folder with annotations from NCBI in the `features` folder.
 
-Features should be places in the `features` directory. Each feature has to have specific name:
-```
-<ncbi_id>_ft.txt
-```
-e.g. `NC_001451_ft.txt`.
+The result is stored in `comparison` folder as detailed format in `{ncbi_id}.txt` file or in excel file `{ncbi_id}.xlsx`. The excel file has 2 worksheets, 
+one detailed for every feature and the second in a form of merged results. Finally there is a `overall.xlsx` file which cointains merged data from every feature alltogether.
 
-## Palindrome analyzes
+## !important notice
 
-Palindrome analyzes should be places in the `palindromes` directory. Each analysis has to have specific name:
-```
-<ncbi_id>_palindrome.csv
-```
-e.g. `NC_001451_palindromes.csv`.
+Because of optimalisation, `{ncbi_id}.xlsx` files already present in `comparison` directory **will not be analysed and processed again**. This enables users to stop the analysis and
+continue where they stopped whenever they need to.
 
-# Processing
+## Usage
 
-The script will match every feature (in `features` directory) file by given NCBI ID to analyzes (in `palindromes` directory) and compares them.
+You can run the script as follows:
 
-Results will be stored in `comparison` directory again according to the NCBI ID.
++ `python3 main.py`, which merges all files in the `features` directory, or as:
++ `python3 main.py -i <ncbi-id>`, which runs the analysis only for the selected ncbi annotation file.
