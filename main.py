@@ -54,10 +54,14 @@ if __name__ == '__main__':
         aggregate_analysis()
     
     if args.profile:
-        with cProfile.Profile() as pr:
-            _run()
+        
+        profile = cProfile.Profile()
+        profile.enable()
+        _run()
+        profile.disable()
+
         with open('profiling_stats.txt', 'w') as stream:
-            stats = Stats(pr, stream=stream)
+            stats = Stats(profile, stream=stream)
             stats.strip_dirs()
             stats.sort_stats('time')
             stats.dump_stats('.prof_stats')
