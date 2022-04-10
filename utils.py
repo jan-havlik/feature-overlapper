@@ -3,7 +3,10 @@ from pathlib import Path
 _DIRS = {
     "features": Path("./features/"),
     "comparison": Path("./comparison/"),
-    "palindromes": Path("./palindromes/")
+    "palindrome": Path("./palindromes/"),
+    "sequences": Path("./sequences/"),
+    "rloop": Path("./rloops/"),
+    "g4": Path("./g4s/"),
 }
 
 _CSV_HEADERS = [
@@ -23,8 +26,9 @@ _CSV_HEADERS = [
     "Average coverage IR 10+ - merged overlapping IRs",
     "Average coverage IR 10+ - non-overlapping IRs",
     "Average coverage IR 12+ - merged overlapping IRs",
-    "Average coverage IR 12+ - non-overlapping IRs"
+    "Average coverage IR 12+ - non-overlapping IRs",
 ]
+
 
 def check_dirs(dirs):
     """
