@@ -1,0 +1,4 @@
+,Feature,Info,Feature start,Feature end,Feature size,Rloops count,Average coverage all Rloops - overlapping,Average coverage all Rloops - non-overlapping,Overall coverage of Rloops - overlapping,Overall coverage of Rloops - non-overlapping
+563,gene,"gene (radC), gene_desc (DNA repair protein), locus_tag (CBU_0291a), pseudo, note (frameshifted ORF), db_xref (GeneID:1208174), ",258846,259505,659,1,16.69195751138088,16.69195751138088,16.69195751138088,16.69195751138088
+2110,CDS,"product (SpoU family rRNA methylase), transl_table (11), protein_id (ref|NP_820130.1||gnl|REF_lhbprmlnih|CBU_1131), ",1073961,1074683,722,1,23.9612188365651,23.9612188365651,23.9612188365651,23.9612188365651
+3187,CDS,"product (aconitate hydratase), EC_number (4.2.1.3), transl_table (11), protein_id (ref|NP_820701.2||gnl|REF_lhbprmlnih|CBU_1720), ",1649917,1652670,2753,1,4.431529240828187,4.431529240828187,4.431529240828187,4.431529240828187
