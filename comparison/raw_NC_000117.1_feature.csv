@@ -1,0 +1,3 @@
+,Feature,Info,Feature start,Feature end,Feature size,Rloops count,Average coverage all Rloops - overlapping,Average coverage all Rloops - non-overlapping,Overall coverage of Rloops - overlapping,Overall coverage of Rloops - non-overlapping
+1554,CDS,"product (bifunctional 3,4-dihydroxy-2-butanone 4-phosphate synthase/GTP cyclohydrolase II), transl_table (11), protein_id (ref|NP_220250.1|), ",843374,844648,1274,1,9.340659340659341,9.340659340659341,9.340659340659341,9.340659340659341
+1858,CDS,"product (deubiquitinase), transl_table (11), protein_id (ref|NP_220390.1|), experiment (DESCRIPTION:Protein purification and characterization[PMID:16824101]), ",1024215,1025471,1256,1,11.94267515923567,11.94267515923567,11.94267515923567,11.94267515923567
