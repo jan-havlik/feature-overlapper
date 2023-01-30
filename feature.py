@@ -55,7 +55,7 @@ def process_feature_file(ncbi: str, analysis: str = "palindrome"):
     }
     analysis_df = pd.read_csv(
         _DIRS[analysis] / f"{ncbi}_{analysis}.csv",
-        delimiter='\t',
+        delimiter=',',
         usecols=list(analysis_map[analysis]["cols"].keys()),
         dtype=analysis_map[analysis]["cols"]
     )
