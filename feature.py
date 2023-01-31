@@ -38,10 +38,14 @@ def process_feature_file(ncbi: str, analysis: str = "palindrome"):
     next(ft)
 
     annotation = None
-    
+
     analysis_map = {
         "palindrome": {
-            "cols": {"Position": np.int32, "Length": np.int16, "Spacer length": np.int16},
+            "cols": {
+                "Position": np.int32,
+                "Length": np.int16,
+                "Spacer length": np.int16,
+            },
             "to_drop": ["Spacer length"],
         },
         "g4": {
@@ -51,31 +55,39 @@ def process_feature_file(ncbi: str, analysis: str = "palindrome"):
         "rloop": {
             "cols": {"POSITION": np.int32, "LENGTH": np.int16},
             "to_drop": ["LENGTH"],
-        }
+        },
     }
     analysis_df = pd.read_csv(
         _DIRS[analysis] / f"{ncbi}_{analysis}.csv",
-        delimiter=',',
+        delimiter=",",
         usecols=list(analysis_map[analysis]["cols"].keys()),
-        dtype=analysis_map[analysis]["cols"]
+        dtype=analysis_map[analysis]["cols"],
     )
 
-    analysis_df = analysis_df.rename(columns={"Position" if analysis=="palindrome" else "POSITION": "start"})
+    analysis_df = analysis_df.rename(
+        columns={"Position" if analysis == "palindrome" else "POSITION": "start"}
+    )
     analysis_df["start"] += 1  # features are indexed from 1 :()
 
     # palindrome has different end position calculation
-    if analysis=="palindrome":
-        analysis_df["end"] = analysis_df["start"] + 2 * analysis_df["Length"] + analysis_df["Spacer length"]
+    if analysis == "palindrome":
+        analysis_df["end"] = (
+            analysis_df["start"]
+            + 2 * analysis_df["Length"]
+            + analysis_df["Spacer length"]
+        )
     else:
         analysis_df["end"] = analysis_df["start"] + analysis_df["LENGTH"]
 
-    analysis_df["middle"] = ((analysis_df["start"] + analysis_df["end"]) / 2).astype(np.int32)
-    analysis_df["len"] = analysis_df["Length" if analysis=="palindrome" else "LENGTH"]
+    analysis_df["middle"] = ((analysis_df["start"] + analysis_df["end"]) / 2).astype(
+        np.int32
+    )
+    analysis_df["len"] = analysis_df["Length" if analysis == "palindrome" else "LENGTH"]
 
     analysis_df = analysis_df.drop(columns=analysis_map[analysis]["to_drop"])
 
     annotations = []
-    
+
     for ft_line in ft:
         split = [x.strip("<>\n") for x in ft_line.split("\t")]
         splitlen = len(split)
@@ -85,10 +97,14 @@ def process_feature_file(ncbi: str, analysis: str = "palindrome"):
             if splitlen == 2:  # uses type from previous annotation
                 split.append(annotation.type)
 
-            if annotation:  # print to csv file BUT REMEBER TO WRITE ALSO THE LAST ONE IN EOF PART
+            if (
+                annotation
+            ):  # print to csv file BUT REMEBER TO WRITE ALSO THE LAST ONE IN EOF PART
                 annotations.append(process(analysis_df, annotation))
 
-            annotation = Annotation(start=int(split[0]), end=int(split[1]), type=split[2])
+            annotation = Annotation(
+                start=int(split[0]), end=int(split[1]), type=split[2]
+            )
 
         elif splitlen == 4:
             annotation.set_info(split[3])
@@ -113,9 +129,7 @@ def process(df: pd.DataFrame, annotation: Annotation):
     """
 
     # if the middle of the palindrome is still inside annotation, we include that palindrome
-    df = df.loc[
-        (df["middle"] >= annotation.start) & (df["middle"] <= annotation.end)
-    ]
+    df = df.loc[(df["middle"] >= annotation.start) & (df["middle"] <= annotation.end)]
     if len(df > 0):
 
         # calculate coverage for non-overlapping palindromes
@@ -147,9 +161,7 @@ def process(df: pd.DataFrame, annotation: Annotation):
             lambda col: annotation.start if annotation.start > col else col
         )
 
-        merged_df["len"] = (
-            merged_df.loc[:, "cov_end"] - merged_df.loc[:, "cov_start"]
-        )
+        merged_df["len"] = merged_df.loc[:, "cov_end"] - merged_df.loc[:, "cov_start"]
         merged_df["coverage"] = merged_df["len"] / diff * 100.0
         annotation.merged_intervals = merged_df
 

@@ -51,7 +51,7 @@ if __name__ == "__main__":
             overlap_analysis_files(args.cmp[0], args.cmp[1], ncbi)
     else:
         analysis = args.cmp[0]
-        
+
         iter_object = (
             _DIRS["features"].iterdir()
             if args.ncbi is None
@@ -76,13 +76,15 @@ if __name__ == "__main__":
                 continue
 
             print(f"=== Analysing batch {ncbi} ... ({ix} / {len(iter_object)}) ===")
-            if len(list(_DIRS["comparison"].glob(f"{ncbi}.xlsx"))) > 0:
+            if len(list(_DIRS["results"].glob(f"{ncbi}.xlsx"))) > 0:
                 print(
-                    f"\tFeature {ncbi} already processed in comparison folder. Skipping..."
+                    f"\tFeature {ncbi} already processed in results folder. Skipping..."
                 )
                 continue
             features = process_feature_file(ncbi, analysis=analysis)
-            palindrome_stats(features, ncbi) if analysis == "palindrome" else stats(features, ncbi, analysis)
+            palindrome_stats(features, ncbi) if analysis == "palindrome" else stats(
+                features, ncbi, analysis
+            )
 
         if analysis == "palindrome":
             # aggregate files togehtehr only in case of palindrome analysis

@@ -6,10 +6,10 @@ from utils import _DIRS
 
 def palindrome_stats(features, ncbi):
 
-    txt = open(_DIRS["comparison"] / f"{ncbi}.txt", "w")
+    txt = open(_DIRS["results"] / f"{ncbi}.txt", "w")
 
     workbook = xlsxwriter.Workbook(
-        _DIRS["comparison"] / f"{ncbi}.xlsx", {"nan_inf_to_errors": True}
+        _DIRS["results"] / f"{ncbi}.xlsx", {"nan_inf_to_errors": True}
     )
     ws_solo = workbook.add_worksheet("Feature to palindromes")
     ws_merged = workbook.add_worksheet("Merged features")
@@ -90,15 +90,9 @@ def palindrome_stats(features, ncbi):
             # xlsx palindrome info
 
             p_all_cov_non = feat.intervals["coverage"]
-            p8_cov_non = feat.intervals.loc[feat.intervals["len"] >= 8][
-                "coverage"
-            ]
-            p10_cov_non = feat.intervals.loc[
-                feat.intervals["len"] >= 10
-            ]["coverage"]
-            p12_cov_non = feat.intervals.loc[
-                feat.intervals["len"] >= 12
-            ]["coverage"]
+            p8_cov_non = feat.intervals.loc[feat.intervals["len"] >= 8]["coverage"]
+            p10_cov_non = feat.intervals.loc[feat.intervals["len"] >= 10]["coverage"]
+            p12_cov_non = feat.intervals.loc[feat.intervals["len"] >= 12]["coverage"]
 
             ws_solo.write(rownum, 5, p_all_cov_non.count())
             ws_solo.write(rownum, 6, p8_cov_non.count())
@@ -133,7 +127,9 @@ def palindrome_stats(features, ncbi):
         if feat.merged_intervals is not None:
 
             p_all_cov = feat.merged_intervals["coverage"]
-            p8_cov = feat.merged_intervals.loc[feat.merged_intervals["len"] >= 8]["coverage"]
+            p8_cov = feat.merged_intervals.loc[feat.merged_intervals["len"] >= 8][
+                "coverage"
+            ]
             p10_cov = feat.merged_intervals.loc[feat.merged_intervals["len"] >= 10][
                 "coverage"
             ]
@@ -248,7 +244,7 @@ def aggregate_palindromes():
     df = pd.concat(
         (
             pd.read_excel(file, sheet_name=1)
-            for file in _DIRS["comparison"].glob("NC_*.xlsx")
+            for file in _DIRS["results"].glob("NC_*.xlsx")
         )
     )
 
@@ -283,7 +279,7 @@ def aggregate_palindromes():
     df_mean = df_mean.drop(["Feature"], axis=1)
 
     workbook = xlsxwriter.Workbook(
-        _DIRS["comparison"] / f"overall.xlsx", {"nan_inf_to_errors": True}
+        _DIRS["results"] / f"overall.xlsx", {"nan_inf_to_errors": True}
     )
     ws = workbook.add_worksheet("Overall feature statistics")
 
@@ -324,12 +320,13 @@ def aggregate_palindromes():
 
     workbook.close()
 
+
 def stats(features, ncbi, analysis: str):
 
-    txt = open(_DIRS["comparison"] / f"{ncbi}.txt", "w")
+    txt = open(_DIRS["results"] / f"{ncbi}.txt", "w")
 
     workbook = xlsxwriter.Workbook(
-        _DIRS["comparison"] / f"{ncbi}.xlsx", {"nan_inf_to_errors": True}
+        _DIRS["results"] / f"{ncbi}.xlsx", {"nan_inf_to_errors": True}
     )
     ws_solo = workbook.add_worksheet(f"Feature to {analysis}s")
     ws_merged = workbook.add_worksheet("Merged features")
@@ -403,15 +400,21 @@ def stats(features, ncbi, analysis: str):
                     "\t%d - %d\t%.2f%%\n" % (row["start"], row["end"], row["coverage"])
                 )
 
-            txt.write(f"\n  {analysis.capitalize()}s in this feature: {p_all_cov_non.count()}\n")
-            
+            txt.write(
+                f"\n  {analysis.capitalize()}s in this feature: {p_all_cov_non.count()}\n"
+            )
+
             # coverage of all R-loops in given feature (number of common R-loop nucleotides / annotation length)
-            analysis_to_feature_coverage = (feat.intervals['cov_end'].max() - feat.intervals['cov_start'].min()) * 100 / feat.len
+            analysis_to_feature_coverage = (
+                (feat.intervals["cov_end"].max() - feat.intervals["cov_start"].min())
+                * 100
+                / feat.len
+            )
             txt.write(
                 f"  Total {analysis} to feature ratio in this feature: {analysis_to_feature_coverage:.2f}%\n\n"
             )
             ws_solo.write(rownum, 9, analysis_to_feature_coverage)
-        else: # null values
+        else:  # null values
             ws_solo.write(rownum, 5, 0)
             ws_solo.write(rownum, 7, 0.0)
             ws_solo.write(rownum, 9, 0.0)
@@ -432,9 +435,16 @@ def stats(features, ncbi, analysis: str):
             txt.write(
                 f"\n  {analysis.capitalize()}s in this feature: {feat.merged_intervals['start'].count()} (merged-overlap)\n"
             )
-            
+
             # coverage of all R-loops in given feature (number of common R-loop nucleotides / annotation length)
-            analysis_to_feature_coverage_merged = (feat.merged_intervals['cov_end'].max() - feat.merged_intervals['cov_start'].min()) * 100 / feat.len
+            analysis_to_feature_coverage_merged = (
+                (
+                    feat.merged_intervals["cov_end"].max()
+                    - feat.merged_intervals["cov_start"].min()
+                )
+                * 100
+                / feat.len
+            )
             txt.write(
                 f"  Total {analysis} to feature ratio in this feature: {analysis_to_feature_coverage_merged:.2f}% (merged-overlap)\n\n"
             )
@@ -447,7 +457,7 @@ def stats(features, ncbi, analysis: str):
                 merged_feature_data[feat.type][
                     3
                 ] += p_all_cov_non.count()  # all palindromes
-                
+
                 merged_feature_data[feat.type][4] = (
                     merged_feature_data[feat.type][4] + p_all_cov_non.mean()
                     if not p_all_cov_non.empty
