@@ -1,8 +1,13 @@
+# py build files
 __pycache__/
 *.py[cod]
 *$py.class
 
+# envronments
 .env
 .venv
 env/
 venv/
+
+# generated files
+results/
