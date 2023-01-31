@@ -6,10 +6,10 @@ from utils import _DIRS
 
 def palindrome_stats(features, ncbi):
 
-    txt = open(_DIRS["comparison"] / f"{ncbi}.txt", "w")
+    txt = open(_DIRS["results"] / f"{ncbi}.txt", "w")
 
     workbook = xlsxwriter.Workbook(
-        _DIRS["comparison"] / f"{ncbi}.xlsx", {"nan_inf_to_errors": True}
+        _DIRS["results"] / f"{ncbi}.xlsx", {"nan_inf_to_errors": True}
     )
     ws_solo = workbook.add_worksheet("Feature to palindromes")
     ws_merged = workbook.add_worksheet("Merged features")
@@ -248,7 +248,7 @@ def aggregate_palindromes():
     df = pd.concat(
         (
             pd.read_excel(file, sheet_name=1)
-            for file in _DIRS["comparison"].glob("NC_*.xlsx")
+            for file in _DIRS["results"].glob("NC_*.xlsx")
         )
     )
 
@@ -283,7 +283,7 @@ def aggregate_palindromes():
     df_mean = df_mean.drop(["Feature"], axis=1)
 
     workbook = xlsxwriter.Workbook(
-        _DIRS["comparison"] / f"overall.xlsx", {"nan_inf_to_errors": True}
+        _DIRS["results"] / f"overall.xlsx", {"nan_inf_to_errors": True}
     )
     ws = workbook.add_worksheet("Overall feature statistics")
 
@@ -326,10 +326,10 @@ def aggregate_palindromes():
 
 def stats(features, ncbi, analysis: str):
 
-    txt = open(_DIRS["comparison"] / f"{ncbi}.txt", "w")
+    txt = open(_DIRS["results"] / f"{ncbi}.txt", "w")
 
     workbook = xlsxwriter.Workbook(
-        _DIRS["comparison"] / f"{ncbi}.xlsx", {"nan_inf_to_errors": True}
+        _DIRS["results"] / f"{ncbi}.xlsx", {"nan_inf_to_errors": True}
     )
     ws_solo = workbook.add_worksheet(f"Feature to {analysis}s")
     ws_merged = workbook.add_worksheet("Merged features")

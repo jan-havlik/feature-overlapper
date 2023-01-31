@@ -64,21 +64,21 @@ def overlap_analysis_files(first, second, ncbi):
 
     # Excel output
     writer = pd.ExcelWriter(
-        _DIRS["comparison"] / f"{ncbi}_{first}_{second}.xlsx", engine="xlsxwriter"
+        _DIRS["results"] / f"{ncbi}_{first}_{second}.xlsx", engine="xlsxwriter"
     )
     df.to_excel(writer, sheet_name=f"{first.capitalize()} to {second.capitalize()}", index=False)
     df_agg.to_excel(writer, sheet_name=f"{first.capitalize()} to {second.capitalize()} GROUPED", index=False)
     writer.save()
     
     # load features
-    df_feat = pd.read_excel(_DIRS["comparison"] / f"{ncbi}.xlsx", f"Feature to {first}s")
+    df_feat = pd.read_excel(_DIRS["results"] / f"{ncbi}.xlsx", f"Feature to {first}s")
     df_feat.drop_duplicates(subset=["Feature start", "Feature end"], keep="last", inplace=True)  # remove features on the same interval
     
     df_feat.drop(df_feat[df_feat[f"{first.capitalize()}s count"] < 1].index, inplace=True) # remove features with 0 overlap !!!
     df_agg.drop(df_agg[df_agg[f"Overlap_count"] < 1].index, inplace=True) # remove 0 analysis overlap !!!
     
-    df_feat.to_csv(_DIRS["comparison"] / f"raw_{ncbi}_feature.csv")
-    df_agg.to_csv(_DIRS["comparison"] / f"raw_{ncbi}_agg.csv")
+    df_feat.to_csv(_DIRS["results"] / f"raw_{ncbi}_feature.csv")
+    df_agg.to_csv(_DIRS["results"] / f"raw_{ncbi}_agg.csv")
     
     if df_agg.empty or df_feat.empty:
         print(f"{ncbi} has empty dataframe!")
@@ -102,7 +102,7 @@ def overlap_analysis_files(first, second, ncbi):
     
     figure = plt.gcf()
     figure.set_size_inches(19.2, 10.8)
-    plt.savefig(f"./comparison/{ncbi}_analysis.png", dpi=600, format='png', bbox_inches='tight')
+    plt.savefig(f"./results/{ncbi}_analysis.png", dpi=600, format='png', bbox_inches='tight')
     
     # SECOND GRAPH -> HEATMAPS
     seq_len = pyfastx.Fasta(f"./sequences/{ncbi}.fasta").size  # TODO: via API
@@ -150,4 +150,4 @@ def overlap_analysis_files(first, second, ncbi):
     plt.tight_layout()
     figure = plt.gcf()
     figure.set_size_inches(8, 6)
-    plt.savefig(f"./comparison/{ncbi}_count.png", dpi=600, format='png', bbox_inches='tight')
+    plt.savefig(f"./results/{ncbi}_count.png", dpi=600, format='png', bbox_inches='tight')

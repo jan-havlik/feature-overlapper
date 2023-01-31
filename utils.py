@@ -2,11 +2,11 @@ from pathlib import Path
 
 _DIRS = {
     "features": Path("./features/"),
-    "comparison": Path("./comparison/"),
+    "results": Path("./results/"),
     "palindrome": Path("./palindromes/"),
     "sequences": Path("./sequences/"),
     "rloop": Path("./rloops/"),
-    "g4": Path("./g4s/"),
+    "g4": Path("./g-quadruplexes/"),
 }
 
 _CSV_HEADERS = [

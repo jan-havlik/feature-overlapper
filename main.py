@@ -76,9 +76,9 @@ if __name__ == "__main__":
                 continue
 
             print(f"=== Analysing batch {ncbi} ... ({ix} / {len(iter_object)}) ===")
-            if len(list(_DIRS["comparison"].glob(f"{ncbi}.xlsx"))) > 0:
+            if len(list(_DIRS["results"].glob(f"{ncbi}.xlsx"))) > 0:
                 print(
-                    f"\tFeature {ncbi} already processed in comparison folder. Skipping..."
+                    f"\tFeature {ncbi} already processed in results folder. Skipping..."
                 )
                 continue
             features = process_feature_file(ncbi, analysis=analysis)
