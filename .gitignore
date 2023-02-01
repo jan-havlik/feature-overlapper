@@ -1,3 +1,6 @@
+# os specific
+.DS_Store
+
 # py build files
 __pycache__/
 *.py[cod]

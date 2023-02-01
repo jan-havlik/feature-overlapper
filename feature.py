@@ -1,6 +1,9 @@
 import numpy as np
 import pandas as pd
 
+from lambdas import feature_to_ncbi, ncbi_to_feature
+from out import aggregate_palindromes, palindrome_stats, stats
+from remote_api import Remote
 from utils import _DIRS
 
 
@@ -34,7 +37,7 @@ def process_feature_file(ncbi: str, analysis: str = "palindrome"):
     Opens both feature and analysis file and processes one annotation after another
     """
 
-    ft = open(_DIRS["features"] / f"{ncbi}_ft.txt", "r")
+    ft = open(_DIRS["features"] / f"{ncbi}.txt", "r")
     next(ft)
 
     annotation = None
@@ -59,7 +62,7 @@ def process_feature_file(ncbi: str, analysis: str = "palindrome"):
     }
     analysis_df = pd.read_csv(
         _DIRS[analysis] / f"{ncbi}_{analysis}.csv",
-        delimiter=",",
+        delimiter="\t",
         usecols=list(analysis_map[analysis]["cols"].keys()),
         dtype=analysis_map[analysis]["cols"],
     )
@@ -166,3 +169,52 @@ def process(df: pd.DataFrame, annotation: Annotation):
         annotation.merged_intervals = merged_df
 
     return annotation
+
+
+def overlap_with_annotations(analysis: str, ncbi_arg):
+    iter_object = (
+        _DIRS["features"].iterdir()
+        if ncbi_arg is None
+        else [ncbi_to_feature(x) for x in ncbi_arg]
+    )
+    dirnum = len(list(_DIRS["features"].glob("*.txt")))
+
+    # go annotation after annotation in annotations directory
+    for ix, annotation_file in enumerate(iter_object, start=1):
+        # convert in case of an object
+
+        ncbi = feature_to_ncbi(annotation_file)
+        api = Remote(ncbi)
+
+        analysis_file = _DIRS[analysis] / f"{ncbi}_{analysis}.csv"
+
+        try:
+            if not annotation_file.is_file():
+                print(
+                    f"Feature file {annotation_file} doesn't exist! Downloading the file for NCBI {ncbi}"
+                )
+                if not api.get_annotation_file():
+                    print(f"Unable to download and process {ncbi} annotation.")
+                    continue
+            if not analysis_file.is_file():
+                print(
+                    f"Feature file {annotation_file} doesn't have matching {analysis} file in `{analysis}` folder! Downloading the file for NCBI {ncbi}"
+                )
+                if not api.get_analysis(analysis):
+                    print(f"Unable to download and process analysis file.")
+                    continue
+        except Exception as exc:
+            print(f"ERROR occured during download: {exc}")
+
+        print(f"=== Analysing batch {ncbi} ... ({ix} / {len(iter_object)}) ===")
+        if len(list(_DIRS["results"].glob(f"{ncbi}.xlsx"))) > 0:
+            print(f"\tFeature {ncbi} already processed in results folder. Skipping...")
+            continue
+        features = process_feature_file(ncbi, analysis=analysis)
+        palindrome_stats(features, ncbi) if analysis == "palindrome" else stats(
+            features, ncbi, analysis
+        )
+
+    if analysis == "palindrome":
+        # aggregate files togehtehr only in case of palindrome analysis
+        aggregate_palindromes()

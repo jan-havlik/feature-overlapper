@@ -4,21 +4,49 @@ import numpy as np
 import pandas as pd
 import pyfastx
 
+from feature import overlap_with_annotations
+from remote_api import Remote
 from utils import _DIRS
 
 
 def overlap_analysis_files(first, second, ncbi):
     print(f"Comparing analyses {first} x {second} for {ncbi}")
+    api = Remote(ncbi)
+
+    first_file = _DIRS[first] / f"{ncbi}_{first}.csv"
+    second_file = _DIRS[second] / f"{ncbi}_{second}.csv"
+
+    try:
+
+        if not (_DIRS["results"] / f"{ncbi}.xlsx").is_file():
+            print(
+                f"No annotation overlap with {first} analysis found, trying to process..."
+            )
+            overlap_with_annotations(first, [ncbi])
+
+        if not first_file.is_file():
+            print(
+                f"Missing input ncbi file for {first} analysis, trying to download..."
+            )
+            api.get_analysis(first)
+        if not second_file.is_file():
+            print(
+                f"Missing input ncbi file for {second} analysis, trying to download..."
+            )
+            api.get_analysis(second)
+    except Exception as exc:
+        print(f"Unable to download analysis files due to {exc}.")
+        exit(0)
 
     first_data = pd.read_csv(
-        _DIRS[first] / f"{ncbi}_{first}.csv",
+        first_file,
         usecols=["POSITION", "LENGTH"],
         dtype={"POSITION": np.int32, "LENGTH": np.int16},
         sep="\t",
     )
 
     second_data = pd.read_csv(
-        _DIRS[second] / f"{ncbi}_{second}.csv",
+        second_file,
         usecols=["POSITION", "LENGTH"],
         dtype={"POSITION": np.int32, "LENGTH": np.int16},
         sep="\t",
@@ -73,7 +101,7 @@ def overlap_analysis_files(first, second, ncbi):
         sheet_name=f"{first.capitalize()} to {second.capitalize()} GROUPED",
         index=False,
     )
-    writer.save()
+    writer.close()
 
     # load features
     df_feat = pd.read_excel(_DIRS["results"] / f"{ncbi}.xlsx", f"Feature to {first}s")
@@ -151,7 +179,7 @@ def overlap_analysis_files(first, second, ncbi):
         heatmap_features.append(
             len(
                 df_feat.loc[
-                    (df_feat["Rloops count"] > 0)
+                    (df_feat[f"{first.capitalize()}s count"] > 0)
                     & (df_feat["Feature start"] >= relative_start)
                     & (df_feat["Feature end"] <= relative_end)
                 ]
